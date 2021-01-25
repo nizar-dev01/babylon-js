@@ -12,7 +12,7 @@ module.exports = {
         extensions: [".tsx", ".ts", ".js"],
     },
     devServer: {
-        host: "0.0.0.0",
+        host: "localhost",
         port: 8080, //port that we're using for local host (localhost:8080)
         disableHostCheck: true,
         contentBase: path.resolve(appDirectory, "public"), //tells webpack to serve from the public folder
