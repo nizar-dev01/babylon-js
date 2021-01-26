@@ -75,7 +75,7 @@ class App {
         const camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
         camera.setTarget(Vector3.Zero());
 
-        //--SCENE FINISHED LOADING--
+        // Wait until the scene finishes loading
         await scene.whenReadyAsync();
         this._engine.hideLoadingUI();
 
@@ -106,6 +106,36 @@ class App {
 
     private async _goToCutScene(){
         
+    }
+
+    private async _goToLose() : Promise<void> {
+        this._engine.displayLoadingUI();
+
+        // Setting up the scene
+        this._scene.detachControl();
+        const scene = new Scene(this._engine);
+        scene.clearColor = new Color4(0, 0, 0, 1);
+
+        const camera = new FreeCamera("camera1", new Vector3(0, 0, 0), scene);
+
+        // GUI Menu
+        const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+        const mainBtn = Button.CreateSimpleButton("mainmenu", "MAIN MENU");
+        mainBtn.width = 0.2;
+        mainBtn.height = "40px";
+        mainBtn.color = "white";
+        guiMenu.addControl(mainBtn);
+        // listen for pinter events
+        mainBtn.onPointerUpObservable.add(()=>{
+            this._goToStart();
+        });
+
+        // Wait until the scene finishes loading
+        await scene.whenReadyAsync();
+        this._engine.hideLoadingUI();
+        this._scene.dispose();
+        this._scene = scene;
+        this._state = State.LOSE;
     }
 }
 
