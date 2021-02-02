@@ -118,7 +118,11 @@ class App {
         const scene = new Scene(this._engine);
         scene.clearColor = new Color4(0, 0, 0, 1);
 
-        const camera = new FreeCamera("startCamera", new Vector3(0, 0, 0), scene);
+        const camera = new FreeCamera(
+            "startCamera", // Name
+            new Vector3(0, 0, 0), // Camera Position
+            scene
+        );
         camera.setTarget(Vector3.Zero());
 
         // Wait until the scene finishes loading
@@ -129,7 +133,7 @@ class App {
         this._scene = scene;
         this._state = State.START;
 
-        // Scene Setup
+        // Creating GUI
 
         const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
         guiMenu.idealHeight = 720;
@@ -162,29 +166,30 @@ class App {
 
 
         // Create GUI
-        const testUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
-        // Next Button ( for testing purposes )
-        const next = Button.CreateSimpleButton("next", "START PLAYING");
-        next.color = "white";
-        next.thickness = 0;
-        next.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
-        next.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
-        next.width = "200px"
-        next.height = "64px";
-        next.top = "-3%";
-        next.left = "-12%";
-        testUI.addControl(next);
+            const testUI = AdvancedDynamicTexture.CreateFullscreenUI("UI");
+            // Next Button ( for testing purposes )
+            const next = Button.CreateSimpleButton("next", "START PLAYING");
+            next.color = "white";
+            next.thickness = 0;
+            next.verticalAlignment = Control.VERTICAL_ALIGNMENT_BOTTOM;
+            next.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_RIGHT;
+            next.width = "200px"
+            next.height = "64px";
+            next.top = "-3%";
+            next.left = "-12%";
+            testUI.addControl(next);
 
-        next.onPointerDownObservable.add(()=>{
-            this._goToGame();
-        });
-
+            next.onPointerDownObservable.add(()=>{
+                this._goToGame();
+            });
+        //
+        
         await this._cutScene.whenReadyAsync();
         this._engine.hideLoadingUI();
         this._scene.dispose();
         this._state = State.CUTSCENE;
         this._scene = this._cutScene;
-
+        
         let finishedLoading = false;
         await this._setUpGame().then( res => {
             finishedLoading = true;
@@ -196,7 +201,7 @@ class App {
         const scene = new Scene(this._engine);
         this._gameScene = scene;
 
-        this._environment = new Environment(scene);;
+        this._environment = new Environment(scene);
         await this._environment.load();
         await this._loadCharacterAssets(scene);
     }
@@ -205,7 +210,7 @@ class App {
         async function loadCharacter(){
             // Collision Mesh
             const outer = MeshBuilder.CreateBox(
-                "box",
+                "outer-box",
                 {
                     width: 2,
                     height: 3,
@@ -225,9 +230,10 @@ class App {
             outer.ellipsoidOffset = new Vector3(0, 1.5, 0);
             // rotate the player mesh 180 since we want to see the back of the player
             outer.rotationQuaternion = new Quaternion(0, 1, 0 ,0);
-
+            
+            // Creating a Capsule Collider
             const box = MeshBuilder.CreateBox(
-                "Small1",
+                "small-box",
                 {
                     width: 0.5,
                     depth: 0.5,
@@ -267,14 +273,14 @@ class App {
             }
         }
 
-        return await loadCharacter().then((assets) => {
+        return loadCharacter().then((assets) => {
             this.assets = assets;
         });
     }
 
     private async _initializeGameAsync(scene: Scene): Promise<void> {
         //temporary light to light the entire scene
-        var light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+        const light0 = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
         const light = new PointLight("sparklight", new Vector3(0, 0, 0), scene);
         light.diffuse = new Color3(0.08627450980392157, 0.10980392156862745, 0.15294117647058825);
         light.intensity = 35;
@@ -312,7 +318,8 @@ class App {
             });
 
             await this._initializeGameAsync(scene); //handles scene related updates & setting up meshes in scene
-            const outerMesh = scene.getMeshByName("outer");
+            
+            const outerMesh = scene.getMeshByName("outer-box");
             if(outerMesh) outerMesh.position = new Vector3(0, 3, 0);
 
             //--WHEN SCENE FINISHED LOADING--
