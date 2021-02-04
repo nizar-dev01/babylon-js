@@ -7,7 +7,6 @@ import {
     Control
 } from "@babylonjs/gui";
 import {
-    ArcRotateCamera,
     Color3,
     Color4,
     Engine,
